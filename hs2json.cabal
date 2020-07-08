@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 017c31ac528e20a27ebdf791cc24c5ce8d3f030b96dadfc0dd44ec9039bbc00a
+-- hash: dd2f5430df47448f3271a1c7f469c5a3d1206b9b582cfa8344fcef0b9f87220f
 
 name:           hs2json
 version:        0.1.0.0
@@ -33,7 +33,8 @@ library
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      QuickCheck
+    , base >=4.7 && <5
   default-language: Haskell2010
 
 executable hs2json-exe
@@ -44,7 +45,8 @@ executable hs2json-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      QuickCheck
+    , base >=4.7 && <5
     , hs2json
   default-language: Haskell2010
 
@@ -57,6 +59,7 @@ test-suite hs2json-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      QuickCheck
+    , base >=4.7 && <5
     , hs2json
   default-language: Haskell2010
