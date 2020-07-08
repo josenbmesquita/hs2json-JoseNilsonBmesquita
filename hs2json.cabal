@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: dd2f5430df47448f3271a1c7f469c5a3d1206b9b582cfa8344fcef0b9f87220f
+-- hash: bcea48a18e693735e6c3ccf9caf3fd6091bfb7d0f792bec8b9058d28ea08fd4c
 
 name:           hs2json
 version:        0.1.0.0
@@ -28,6 +28,7 @@ source-repository head
 library
   exposed-modules:
       Lib
+      SimpleJSON
   other-modules:
       Paths_hs2json
   hs-source-dirs:
