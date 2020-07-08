@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f6482eeb05d04b3f6b9ca12008b63245a6abd9fde40d7258af49bd4950aa3689
+-- hash: ae47ecbe633754635079fd1185f439d0480c40b383a6eaa2cb8944490087a40e
 
 name:           hs2json
 version:        0.1.0.0
@@ -27,6 +27,8 @@ source-repository head
 
 library
   exposed-modules:
+      Prettify
+      PutJSON
       SimpleJSON
   other-modules:
       Paths_hs2json
