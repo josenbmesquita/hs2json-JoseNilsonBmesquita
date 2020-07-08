@@ -10,4 +10,4 @@ qsort (x:xs) = qsort lhs ++ [x] ++ qsort rhs
           rhs = filter (>= x) xs
 
 someFunc :: IO ()
-someFunc = putStrLn "Olá mundo!!"
+someFunc = putStrLn "someFunc"
