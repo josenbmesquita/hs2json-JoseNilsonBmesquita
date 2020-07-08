@@ -1,6 +1,7 @@
-module Main where
+-- file: app/Main.hs
+module Main (main) where
 
-import Lib
+import SimpleJSON
 
 main :: IO ()
-main = someFunc
+main = print (JObject [("foo", JNumber 1), ("bar", JBool False)])
