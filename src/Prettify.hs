@@ -117,3 +117,137 @@ renderJValue (JObject obj) = series '{' '}' field obj
     where field (name,val) = string name
                           <> text ": "
                           <> renderJValue val
+
+-- file: src/PrettyJSON.hs
+module PrettyJSON
+    (
+      renderJValue
+    ) where
+
+import Numeric (showHex)
+import Data.Char (ord)
+import Data.Bits (shiftR, (.&.))
+
+import SimpleJSON (JValue(..))
+import Prettify (Doc, (<>), char, double, fsep, hcat, punctuate, text,
+                 compact, pretty)
+
+-- file: src/Prettify.hs
+data Doc = Empty
+         | Char Char
+         | Text String
+         | Line
+         | Concat Doc Doc
+         | Union Doc Doc
+           deriving (Show,Eq)
+
+-- file: src/Prettify.hs
+empty :: Doc
+empty = Empty
+
+char :: Char -> Doc
+char c = Char c
+
+text :: String -> Doc
+text "" = Empty
+text s  = Text s
+
+double :: Double -> Doc
+double d = text (show d)
+
+-- file: src/Prettify.hs
+line :: Doc
+line = Line
+
+-- file: src/Prettify.hs
+(<>) :: Doc -> Doc -> Doc
+Empty <> y = y
+x <> Empty = x
+x <> y = x `Concat` y
+
+-- file: src/Prettify.hs
+concat :: [[a]] -> [a]
+concat = foldr (++) []
+
+-- file: src/Prettify.hs
+hcat :: [Doc] -> Doc
+hcat = fold (<>)
+
+fold :: (Doc -> Doc -> Doc) -> [Doc] -> Doc
+fold f = foldr f empty
+
+-- file: src/Prettify.hs
+fsep :: [Doc] -> Doc
+fsep = fold (</>)
+
+(</>) :: Doc -> Doc -> Doc
+x </> y = x <> softline <> y
+
+softline :: Doc
+softline = group line
+
+-- file: src/Prettify.hs
+group :: Doc -> Doc
+group x = flatten x \`Union\` x
+
+-- file: src/Prettify.hs
+flatten :: Doc -> Doc
+flatten (x \`Concat\` y) = flatten x \`Concat\` flatten y
+flatten Line           = Char ' '
+flatten (x \`Union\` _)  = flatten x
+flatten other          = other
+
+-- file: src/Prettify.hs
+compact :: Doc -> String
+compact x = transform [x]
+    where transform [] = ""
+          transform (d:ds) =
+              case d of
+                Empty        -> transform ds
+                Char c       -> c : transform ds
+                Text s       -> s ++ transform ds
+                Line         -> '\n' : transform ds
+                a `Concat` b -> transform (a:b:ds)
+                _ `Union` b  -> transform (b:ds)
+
+-- file: src/Prettify.hs
+pretty :: Int -> Doc -> String
+
+-- file: src/Prettify.hs
+pretty width x = best 0 [x]
+    where best col (d:ds) =
+              case d of
+                Empty        -> best col ds
+                Char c       -> c :  best (col + 1) ds
+                Text s       -> s ++ best (col + length s) ds
+                Line         -> '\n' : best 0 ds
+                a `Concat` b -> best col (a:b:ds)
+                a `Union` b  -> nicest col (best col (a:ds))
+                                           (best col (b:ds))
+          best _ _ = ""
+
+          nicest col a b | (width - least) `fits` a = a
+                         | otherwise                = b
+                         where least = min width col
+
+-- file: src/Prettify.hs
+fits :: Int -> String -> Bool
+w `fits` _ | w < 0 = False
+w `fits` ""        = True
+w `fits` ('\n':_)  = True
+w `fits` (c:cs)    = (w - 1) `fits` cs
+
+-- file: app/Main.hs
+module Main (main) where
+
+import SimpleJSON
+import Prettify
+import PrettyJSON
+
+
+value = renderJValue $ JObject [("f", JNumber 1), ("q", JBool True)]
+main :: IO ()
+main = do
+    putStrLn (pretty 10 value)
+    putStrLn (pretty 20 value)
+    putStrLn (pretty 30 value)
